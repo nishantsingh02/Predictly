@@ -13,16 +13,35 @@ export function useUser() {
       }
     });
 
-    // Listen for auth changes
+    // // Listen for auth changes
+    // const {
+    //   data: { subscription },
+    // } = supabase.auth.onAuthStateChange(() => {
+    //   (supabase.auth as any).getClaims().then(({ data }: any) => {
+    //     if (data) {
+    //       setClaims(data.claims);
+    //     }
+    //   });
+    // });
+
+     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      (supabase.auth as any).getClaims().then(({ data }: any) => {
-        if (data) {
-          setClaims(data.claims);
+      } = supabase.auth.onAuthStateChange((event) => {
+        // Immediately clear claims on sign out
+        if (event === "SIGNED_OUT") {
+          setClaims(null);
+          return;
         }
+        // Otherwise, update claims if available, or clear if missing
+        (supabase.auth as any).getClaims().then(({ data }: any) => {
+          if (data) {
+            setClaims(data.claims);
+          } else {
+            setClaims(null);
+          }
+        });
       });
-    });
 
     return () => subscription.unsubscribe();
   }, [supabase]);

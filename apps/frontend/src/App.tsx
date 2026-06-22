@@ -1,13 +1,13 @@
 import { useUser } from "./hooks/useUser";
 import { useSupabase } from "./hooks/useSupabase";
+import axios from "axios";
 
 function App() {
-  const {claims} = useUser();
+  const { claims } = useUser();
   const supabase = useSupabase();
 
   return (
     <div>
-
       {!claims && (
         <button
           onClick={async () => {
@@ -27,57 +27,6 @@ function App() {
       {claims && (
         <button
           onClick={async () => {
-           const { error } = await supabase.auth.signOut();
-            console.log(error)
-          }}
-        >
-          Logout
-        </button>
-      )}
-
-      {/* {JSON.stringify(claims)} */}
-      
-    </div>
-  );
-}
-
-export default App;
-
-
-{/* <div>
-      {!claims && (
-        <button
-          onClick={async () => {
-            const provider = (window as any).phantom?.solana;
-            if (!provider) {
-              alert("Phantom wallet not found. Please install it.");
-              return;
-            }
-
-            try {
-              if (!provider.publicKey) {
-                await provider.connect();
-              }
-
-              await supabase.auth.signInWithWeb3({
-                chain: "solana",
-                statement:
-                  "I accept the Predictly Terms of Service available at https://predictly.com/terms",
-                wallet: provider,
-              });
-            } catch (error) {
-              console.error("Authentication failed:", error);
-              alert("Sign in failed. Check console for details.");
-            }
-          }}
-        >
-          Sign in with Solana
-        </button>
-      )}
-
-      {claims && (
-        <button
-          onClick={async () => {
             await supabase.auth.signOut();
           }}
         >
@@ -85,6 +34,43 @@ export default App;
         </button>
       )}
 
-      {JSON.stringify(claims)}
-      
-    </div> */}
+      {/* {JSON.stringify(claims)} */}
+
+      {/* <button onClick={async () => {
+        await supabase.auth.getSession().then(async r => {
+          await axios.post("http://localhost:3000/buy", {}, {
+            headers: {
+              Authorization: r.data.session?.access_token
+            }
+          })
+        })
+      }}>Click to buy</button> */}
+
+      <button
+        onClick={async () => {
+          const { data, error } = await supabase.auth.getSession();
+
+          if (error || !data.session) {
+            console.error("No active session");
+            return;
+          }
+
+          await axios.post(
+            "http://localhost:3000/buy",
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${data.session.access_token}`,
+              },
+            },
+          );
+        }}
+      >
+        Click to buy
+      </button>
+
+    </div>
+  );
+}
+
+export default App;
