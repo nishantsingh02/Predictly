@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @id @default(uuid())
+  address String
+  usdBalance Int // $100.11 => 10011 asume a decimal of 2 for fiat balance
+  positions Position[] // a single user have multiple positions
+}
+
+// we merge both market schema and orderbook schema
+model Market {
+  id String @id @default(uuid())
+  title String
+  description String
+  resolution String // what leads to it yes or no
+
+  yesOrderbook Json
+  noOrderbook Json
+  totalQty Int
+
+  positions Position[]
+}
+
+model Position {
+  id String @id @default(uuid())
+  userId String // foreign key
+  marketId String // foreign key
+  type PositionType
+
+  user User @relation(fields: [userId], references: [id])
+  maket Market @relation(fields: [marketId], references: [id])
+}
+
+enum PositionType {
+  Yes
+  No
+}
