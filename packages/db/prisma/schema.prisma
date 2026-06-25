@@ -17,6 +17,7 @@ model User {
   address String
   usdBalance Int // $100.11 => 10011 asume a decimal of 2 for fiat balance
   positions Position[] // a single user have multiple positions
+  order OrderHistory[] // a single user have multiple order histroy
 }
 
 // we merge both market schema and orderbook schema
@@ -24,13 +25,15 @@ model Market {
   id String @id @default(uuid())
   title String
   description String
-  resolution String // what leads to it yes or no
+  resolutionDescription String // what leads to it yes or no
 
   yesOrderbook Json
   noOrderbook Json
   totalQty Int
 
   positions Position[]
+  order OrderHistory[]
+  resolution  PositionType? // yes or no
 }
 
 model Position {
@@ -41,9 +44,29 @@ model Position {
 
   user User @relation(fields: [userId], references: [id])
   maket Market @relation(fields: [marketId], references: [id])
+
 }
 
 enum PositionType {
   Yes
   No
+}
+
+model OrderHistory {
+  id String @id @default(uuid())
+  orderType  OrderType
+  qty Int
+  price Int // 0.01 0.99 (1-100) need to devide by 100 while showing this on frontend
+  userId String
+  marketId String
+
+  user User @relation(fields: [userId], references: [id])
+  market Market @relation(fields: [marketId], references: [id])
+}
+
+enum OrderType {
+  Buy
+  Sell
+  Split
+  Merge
 }
