@@ -2,6 +2,9 @@
   "name": "db",
   "module": "index.ts",
   "type": "module",
+  "export": {
+    "./": "./index.ts"
+  },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",

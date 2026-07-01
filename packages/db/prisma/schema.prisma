@@ -43,7 +43,7 @@ model Position {
   type PositionType
 
   user User @relation(fields: [userId], references: [id])
-  maket Market @relation(fields: [marketId], references: [id])
+  market Market @relation(fields: [marketId], references: [id])
 
 }
 

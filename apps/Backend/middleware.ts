@@ -21,6 +21,8 @@ export async function middleware(
     ? authHeader.slice(7)
     : authHeader;
 
+  console.log("exact token:", token);
+
   try {
     // const response = await supabase.auth.getUser();
     // const user = response.data.user;
