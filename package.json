@@ -24,6 +24,7 @@
   "dependencies": {
     "@types/dotenv": "^8.2.3",
     "@types/node": "^26.0.1",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "uuidv4": "^6.2.13"
   }
 }

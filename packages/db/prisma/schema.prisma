@@ -14,7 +14,7 @@ datasource db {
 
 model User {
   id String @id @default(uuid())
-  address String
+  address String @unique
   usdBalance Int // $100.11 => 10011 asume a decimal of 2 for fiat balance
   positions Position[] // a single user have multiple positions
   order OrderHistory[] // a single user have multiple order histroy
@@ -44,7 +44,8 @@ model Position {
 
   user User @relation(fields: [userId], references: [id])
   market Market @relation(fields: [marketId], references: [id])
-
+  qty Int
+  @@unique([userId, marketId, type])
 }
 
 enum PositionType {

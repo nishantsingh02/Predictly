@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { prisma } from "db";
 
 // supabase client
 const supabase = createClient(
@@ -21,7 +22,7 @@ export async function middleware(
     ? authHeader.slice(7)
     : authHeader;
 
-  console.log("exact token:", token);
+  // console.log("exact token:", token);
 
   try {
     // const response = await supabase.auth.getUser();
@@ -31,14 +32,33 @@ export async function middleware(
     const { data: { user }, error } = await supabase.auth.getUser(token);
     const address = user?.user_metadata.custom_claims.address;
 
-    console.log("user console:", user); // see this log for getiing useer address
-    console.log("user error", error);
+    // update or insert ( its a comb of update or insert)
+    const userDb = await prisma.user.upsert({
+      where: {
+        address,
+      },
+      update : {
+        address
+      },
+      create: {
+        address,
+        usdBalance: 0
+      }
+    })
+
+    // console.log("user console:", user); // see this log for getiing useer address
+    // console.log("user error", error);
+
+    if(address) {
+      req.userId = userDb.id;
+      next();
+    }
 
     if (error || !user) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }
   } catch (err) {
-    res.status(403).json({
+    return res.status(403).json({
       message: "Incoreect Credentials",
     });
   }
